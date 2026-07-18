@@ -64,11 +64,13 @@ def read_project_folders(path):
     
 def generate_report(content,rules):
     
-    report = {}
+    validated_folders = {}
+    ignored_folders = []
     
     for folder in content:
         
         if folder not in rules:
+            ignored_folders.append(folder)
             continue
         
         files = content[folder]
@@ -76,15 +78,46 @@ def generate_report(content,rules):
         
         validation = validate_files(files,valid_extension)
         
-        report[folder]=validation
+        validated_folders[folder]=validation
         
-    return report
+    return {
+        "validated_folders":validated_folders,
+        "ignored_folders":ignored_folders
+    }
 
 def save_json(path,data):
     
     with open(path,"w") as file:
         json.dump(data,file,indent=4)
+
+def print_summary(report,report_path):
+       
+    validated_folders = report["validated_folders"]   
+    ignored_folders = report["ignored_folders"]
     
+    print("Asset Folder Validator")
+    print("")
+    print("Validated folders:")
+    
+    for folder in validated_folders:
+        folder_report = validated_folders[folder]
+        
+        print(f"Folder Name: {folder}")
+        print(f"Total valid: {folder_report['total_valid']}")
+        print(f"Total review: {folder_report["total_review"]}")
+        print("")
+        
+    print("")
+    print("Ignored Folders: ")
+    
+    for folder in ignored_folders:
+        
+        print(folder)
+        print("")
+        
+    print("")
+    print("Report saved in:")
+    print(report_path)   
     
 def main():
     
@@ -101,10 +134,14 @@ def main():
     report = generate_report(content,rules) # Generate the validation report
     
     save_json(report_path,report) # Save the report as JSON
-    
-    print("Report generated succesfully")
-    print(f"Report saved in: {report_path}")
-    
-main()
+        
+    print_summary(report,report_path)
+   
+
+        
+
+
+if __name__ == "__main__": 
+   main()
     
 
