@@ -86,12 +86,25 @@ def save_json(path,data):
         json.dump(data,file,indent=4)
     
     
-        
+def main():
     
-base_path = os.path.dirname(__file__)
+    base_path = os.path.dirname(__file__)       #Get the script folder
+    
+    sample_project_path = os.path.join(base_path,"sample_project") # Built projects and output path
+    output_path = os.path.join(base_path,"output")
+    report_path = os.path.join(output_path,"report.json")
+    
+    os.makedirs(output_path, exist_ok=True)
+    
+    content = read_project_folders(sample_project_path) # Read project folders
+    
+    report = generate_report(content,rules) # Generate the validation report
+    
+    save_json(report_path,report) # Save the report as JSON
+    
+    print("Report generated succesfully")
+    print(f"Report saved in: {report_path}")
+    
+main()
+    
 
-
-
-sample_project_path = os.path.join(base_path,"sample_project")
-content = read_project_folders(sample_project_path)
-print(generate_report(content,rules))

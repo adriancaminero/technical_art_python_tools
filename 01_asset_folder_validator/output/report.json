@@ -1,0 +1,28 @@
+{
+    "Meshes": {
+        "valid": [
+            "Edificio.fbx",
+            "Techo.fbx",
+            "ventilaciion.fbx"
+        ],
+        "review": [
+            "screenshot008.png"
+        ],
+        "total": 4,
+        "total_valid": 3,
+        "total_review": 1
+    },
+    "Textures": {
+        "valid": [
+            "screenshot000.png",
+            "screenshot001.png",
+            "screenshot003.png"
+        ],
+        "review": [
+            "Vinera.fbx"
+        ],
+        "total": 4,
+        "total_valid": 3,
+        "total_review": 1
+    }
+}
