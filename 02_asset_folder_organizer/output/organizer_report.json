@@ -1,0 +1,23 @@
+{
+    "summary": {
+        "total_files": 7,
+        "total_meshes": 2,
+        "total_textures": 4,
+        "total_other": 1
+    },
+    "classified_files": {
+        "mesh": [
+            "chair.fbx",
+            "sm_jeep.fbx"
+        ],
+        "texture": [
+            "chairbasecolor - copia.png",
+            "jeepbasecolor.png",
+            "jeeprougness.jpg",
+            "screenshot008.jpg"
+        ],
+        "other": [
+            "notes.txt"
+        ]
+    }
+}
