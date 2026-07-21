@@ -15,16 +15,24 @@ The goal of this tool is to scan a sample asset project, validate files based on
 - Tracks folders that do not have validation rules.
 - Exports the result as a JSON report.
 - Prints a readable summary in the console.
+- Validates basic naming conventions for assets.
+- Checks required prefixes for each folder type.
+- Reports naming errors such as invalid prefix, uppercase letters and spaces.
 
 ## Current validation rules
 
 ```python
 rules = {
-    "Meshes": (".fbx",),
-    "Textures": (".png", ".jpg", ".jpeg", ".tga")
+    "Meshes": {
+        "extensions": (".fbx",),
+        "prefix": "sm_"
+    },
+    "Textures": {
+        "extensions": (".png", ".jpg", ".jpeg", ".tga"),
+        "prefix": "t_"
+    }
 }
 ```
-
 ## Expected folder structure
 
 ```text
