@@ -8,7 +8,16 @@ rules = {
     },
     "Textures": {
         "extensions": (".png", ".jpg", ".jpeg", ".tga"),
-        "prefix": "t_"
+        "prefix": "t_",
+        "suffixes": (
+            "_basecolor",
+            "_normal",
+            "_roughness",
+            "_metallic",
+            "_ao",
+            "_opacity",
+            "_emissive"
+        )
     }
 }
 
@@ -62,11 +71,19 @@ def validate_file(file_name,folder_rule):
     valid_extension = folder_rule["extensions"]
     required_prefix = folder_rule["prefix"]
     
-    if not file_name.endswith(valid_extension):
+    extension_is_valid = file_name.endswith(valid_extension)
+    
+    if not extension_is_valid:
         errors.append("Invalid extension")
 
     name_errors = validate_file_name(file_name,required_prefix)
     errors.extend(name_errors)
+    
+    if "suffixes" in folder_rule and extension_is_valid:
+        allowed_suffixes = folder_rule["suffixes"]
+        
+        suffix_errors = validate_texture_suffix(file_name,allowed_suffixes)
+        errors.extend(suffix_errors)
     
     return {
         "file":file_name,
@@ -90,6 +107,16 @@ def validate_file_name(file,required_prefix):
         
     return errors
 
+def validate_texture_suffix(file_name,allowed_suffixes):
+    
+    errors = []
+    
+    name,extension = os.path.splitext(file_name)
+    
+    if not name.endswith(allowed_suffixes):
+        errors.append("Invalid texture suffix")
+        
+    return errors
 
 def read_project_folders(path):
     
@@ -107,7 +134,6 @@ def read_project_folders(path):
         
     return content
 
- 
 def generate_report(content,rules):
     
     validated_folders = {}

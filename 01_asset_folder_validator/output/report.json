@@ -33,25 +33,28 @@
         },
         "Textures": {
             "valid": [
-                "t_tire.png"
+                "t_tire_basecolor.png"
             ],
             "review": [
                 {
                     "file": "screenshot000.png",
                     "errors": [
-                        "Invalid prefix"
+                        "Invalid prefix",
+                        "Invalid texture suffix"
                     ]
                 },
                 {
                     "file": "screenshot001.png",
                     "errors": [
-                        "Invalid prefix"
+                        "Invalid prefix",
+                        "Invalid texture suffix"
                     ]
                 },
                 {
                     "file": "screenshot003.png",
                     "errors": [
-                        "Invalid prefix"
+                        "Invalid prefix",
+                        "Invalid texture suffix"
                     ]
                 },
                 {
