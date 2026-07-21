@@ -18,6 +18,7 @@ The goal of this tool is to scan a sample asset project, validate files based on
 - Validates basic naming conventions for assets.
 - Checks required prefixes for each folder type.
 - Reports naming errors such as invalid prefix, uppercase letters and spaces.
+- Validates texture map suffixes such as `_basecolor`, `_normal`, `_roughness`, `_metallic`, `_ao`, `_opacity` and `_emissive`.
 
 ## Current validation rules
 
@@ -29,7 +30,16 @@ rules = {
     },
     "Textures": {
         "extensions": (".png", ".jpg", ".jpeg", ".tga"),
-        "prefix": "t_"
+        "prefix": "t_",
+        "suffixes": (
+            "_basecolor",
+            "_normal",
+            "_roughness",
+            "_metallic",
+            "_ao",
+            "_opacity",
+            "_emissive"
+        )
     }
 }
 ```
