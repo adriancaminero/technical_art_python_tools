@@ -2,29 +2,70 @@
     "validated_folders": {
         "Meshes": {
             "valid": [
-                "Edificio.fbx",
-                "Techo.fbx",
-                "ventilaciion.fbx"
+                "sm_ventilaciion.fbx"
             ],
             "review": [
-                "screenshot008.png"
+                {
+                    "file": "Edificio.fbx",
+                    "errors": [
+                        "Invalid prefix",
+                        "File must be lowercase"
+                    ]
+                },
+                {
+                    "file": "screenshot008.png",
+                    "errors": [
+                        "Invalid extension",
+                        "Invalid prefix"
+                    ]
+                },
+                {
+                    "file": "Techo.fbx",
+                    "errors": [
+                        "Invalid prefix",
+                        "File must be lowercase"
+                    ]
+                }
             ],
             "total": 4,
-            "total_valid": 3,
-            "total_review": 1
+            "total_valid": 1,
+            "total_review": 3
         },
         "Textures": {
             "valid": [
-                "screenshot000.png",
-                "screenshot001.png",
-                "screenshot003.png"
+                "t_tire.png"
             ],
             "review": [
-                "Vinera.fbx"
+                {
+                    "file": "screenshot000.png",
+                    "errors": [
+                        "Invalid prefix"
+                    ]
+                },
+                {
+                    "file": "screenshot001.png",
+                    "errors": [
+                        "Invalid prefix"
+                    ]
+                },
+                {
+                    "file": "screenshot003.png",
+                    "errors": [
+                        "Invalid prefix"
+                    ]
+                },
+                {
+                    "file": "Vinera.fbx",
+                    "errors": [
+                        "Invalid extension",
+                        "Invalid prefix",
+                        "File must be lowercase"
+                    ]
+                }
             ],
-            "total": 4,
-            "total_valid": 3,
-            "total_review": 1
+            "total": 5,
+            "total_valid": 1,
+            "total_review": 4
         }
     },
     "ignored_folders": [

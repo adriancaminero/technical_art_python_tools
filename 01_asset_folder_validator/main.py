@@ -2,8 +2,14 @@ import os
 import json
 
 rules = {
-    "Meshes": (".fbx",),
-    "Textures": (".png", ".jpg", ".jpeg", ".tga")
+    "Meshes": {
+        "extensions": (".fbx",),
+        "prefix": "sm_"
+    },
+    "Textures": {
+        "extensions": (".png", ".jpg", ".jpeg", ".tga"),
+        "prefix": "t_"
+    }
 }
 
 def list_files(path):
@@ -26,25 +32,64 @@ def list_folders(path):
     
     return folders    
 
-def validate_files(files,valid_extensions):
+def validate_files(file_list,folder_rule):
     
     valid = []
     review = []
     
-    for file in files:
+    for file_name in file_list:
         
-        if file.endswith(valid_extensions):
-            valid.append(file)
+        file_report = validate_file(file_name,folder_rule)
+        
+        if file_report["errors"]==[]:
+            
+            valid.append(file_name)
         else:
-            review.append(file)
+            
+            review.append(file_report)
             
     return{
         "valid":valid,
         "review":review,
-        "total":len(files),
+        "total":len(file_list),
         "total_valid":len(valid),
         "total_review":len(review)
     }
+
+def validate_file(file_name,folder_rule):
+    errors = []
+    
+    valid_extension = folder_rule["extensions"]
+    required_prefix = folder_rule["prefix"]
+    
+    if not file_name.endswith(valid_extension):
+        errors.append("Invalid extension")
+
+    name_errors = validate_file_name(file_name,required_prefix)
+    errors.extend(name_errors)
+    
+    return {
+        "file":file_name,
+        "errors":errors
+    }
+
+def validate_file_name(file,required_prefix):
+    
+    errors = []
+    
+    name, extensions = os.path.splitext(file)
+    
+    if not name.startswith(required_prefix):
+        errors.append("Invalid prefix")
+        
+    if  not name.islower():
+        errors.append("File must be lowercase")
+    
+    if " " in name:
+        errors.append("File name cannot contain spaces")
+        
+    return errors
+
 
 def read_project_folders(path):
     
@@ -61,7 +106,8 @@ def read_project_folders(path):
         content[folder]=files
         
     return content
-    
+
+ 
 def generate_report(content,rules):
     
     validated_folders = {}
@@ -70,13 +116,15 @@ def generate_report(content,rules):
     for folder in content:
         
         if folder not in rules:
+            
             ignored_folders.append(folder)
             continue
         
-        files = content[folder]
-        valid_extension = rules[folder]
+        file_list = content[folder]
+        folder_rule = rules[folder]
         
-        validation = validate_files(files,valid_extension)
+        
+        validation = validate_files(file_list,folder_rule)
         
         validated_folders[folder]=validation
         
@@ -92,7 +140,7 @@ def save_json(path,data):
 
 def print_summary(report,report_path):
        
-    validated_folders = report["validated_folders"]   
+    validated_folders = report["validated_folders"] 
     ignored_folders = report["ignored_folders"]
     
     print("Asset Folder Validator")
@@ -121,7 +169,7 @@ def print_summary(report,report_path):
     
 def main():
     
-    base_path = os.path.dirname(__file__)       #Get the script folder
+    base_path = os.path.dirname(__file__)       # Get the script folder
     
     sample_project_path = os.path.join(base_path,"sample_project") # Built projects and output path
     output_path = os.path.join(base_path,"output")
@@ -138,7 +186,7 @@ def main():
     print_summary(report,report_path)
    
 
-        
+      
 
 
 if __name__ == "__main__": 
