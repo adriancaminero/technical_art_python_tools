@@ -2,8 +2,9 @@
     "summary": {
         "total_files": 7,
         "total_meshes": 2,
-        "total_textures": 4,
-        "total_other": 1
+        "total_textures": 3,
+        "total_other": 2,
+        "total_assets": 2
     },
     "classified_files": {
         "mesh": [
@@ -11,13 +12,44 @@
             "sm_jeep.fbx"
         ],
         "texture": [
-            "chairbasecolor - copia.png",
+            "chairbasecolor.png",
             "jeepbasecolor.png",
-            "jeeprougness.jpg",
-            "screenshot008.jpg"
+            "jeeproughness.jpg"
         ],
         "other": [
-            "notes.txt"
+            "notes.txt",
+            "screenshot008.jpg"
         ]
+    },
+    "assets": {
+        "chair": {
+            "meshes": [
+                "chair.fbx"
+            ],
+            "textures": [
+                "chairbasecolor.png"
+            ]
+        },
+        "jeep": {
+            "meshes": [
+                "sm_jeep.fbx"
+            ],
+            "textures": [
+                "jeepbasecolor.png",
+                "jeeproughness.jpg"
+            ]
+        }
+    },
+    "suggested_structure": {
+        "chair": {
+            "asset_folder": "organized_assets/chair",
+            "meshes_folder": "organized_assets/chair/meshes",
+            "textures_folder": "organized_assets/chair/textures"
+        },
+        "jeep": {
+            "asset_folder": "organized_assets/jeep",
+            "meshes_folder": "organized_assets/jeep/meshes",
+            "textures_folder": "organized_assets/jeep/textures"
+        }
     }
 }
