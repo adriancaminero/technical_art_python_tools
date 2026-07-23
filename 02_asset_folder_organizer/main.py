@@ -63,7 +63,12 @@ def generate_report(classified_files):
     
     assets = group_files_by_asset(classified_files)
     
-    suggestion = generate_suggested_structure(assets)
+    suggestion = generate_suggested_structure(assets,other)
+    
+    actions = generate_suggested_actions(assets,other)
+    
+    conflicts = detect_destination_conflict(actions)
+   
     
     return{
         "summary":{
@@ -71,7 +76,9 @@ def generate_report(classified_files):
         "total_meshes":len(meshes),
         "total_textures":len(textures),
         "total_other":len(other),
-        "total_assets":len(assets)
+        "total_assets":len(assets),
+        "total_suggested_actions":len(actions),
+        "total_conflicts":len(conflicts)
         },
         "classified_files":{
             "mesh":meshes,
@@ -79,7 +86,9 @@ def generate_report(classified_files):
             "other":other            
         },
         "assets":assets,
-        "suggested_structure":suggestion
+        "suggested_structure":suggestion,
+        "suggested_actions":actions,
+        "conflicts":conflicts
     }
     
 def extract_asset_id(file_name,file_type):
@@ -155,7 +164,7 @@ def group_files_by_asset(classified_files):
         
     return assets    
         
-def generate_suggested_structure(assets):
+def generate_suggested_structure(assets,other_files):
     
     suggested_structure = {}
     
@@ -170,9 +179,134 @@ def generate_suggested_structure(assets):
             "meshes_folder":mesh_folder,
             "textures_folder":texture_folder
         }
+    
+    if len(other_files)>0:
+        suggested_structure["misc"]={
+            "misc_folder":"organized_assets/misc"
+        }
+        
+        
      
     return suggested_structure
+  
+def generate_suggested_actions(assets,other_files):
     
+    suggested_actions = []
+    
+    
+    for asset in assets:
+        asset_data = assets[asset]
+        
+        meshes = asset_data["meshes"]
+        textures = asset_data["textures"]    
+        
+        for mesh in meshes:
+            source_path = "sample_input/"+mesh     
+            suggested_name = suggest_file_name(mesh,"mesh",asset)       
+            destination_path = f"organized_assets/{asset}/meshes/{suggested_name}"
+            needs_rename = suggested_name!=mesh
+            
+            
+            suggested_actions.append({
+                "action":"move",
+                "file":mesh,
+                "needs_rename":needs_rename,
+                "suggested_name": suggested_name,
+                "from":source_path,
+                "to":destination_path
+            })
+            
+        for texture in textures:
+            source_path = "sample_input/"+texture   
+            suggested_name = suggest_file_name(texture,"texture",asset)         
+            destination_path = f"organized_assets/{asset}/textures/{suggested_name}"
+            needs_rename = suggested_name!=texture
+            
+            suggested_actions.append({
+                "action":"move",
+                "file":texture,
+                "needs_rename":needs_rename,
+                "suggested_name": suggested_name,
+                "from":source_path,
+                "to":destination_path
+                })
+    for other_file in other_files:
+            source_path = "sample_input/"+other_file   
+            needs_rename = False
+              
+            destination_path = f"organized_assets/misc/{other_file}"
+            suggested_actions.append({
+                "action": "move",
+                "file": other_file,
+                "needs_rename":needs_rename
+                "from": source_path,
+                "to": destination_path
+                })
+            
+    return suggested_actions
+ 
+def detect_texture_map_type(file_name):
+    map_types= ["basecolor",
+                "normal",
+                "roughness",
+                "metallic",
+                "ao",
+                "opacity",
+                "emissive"
+                ]
+    
+    name, extension = os.path.splitext(file_name)
+    
+    name = name.lower()
+    
+    for map_type in map_types:
+        if map_type in name:
+            return map_type
+        
+    return None
+           
+def suggest_file_name(file_name,file_type,asset_id):
+    name , extension = os.path.splitext(file_name)
+    extension = extension.lower()
+    if file_type ==  "mesh":
+                
+        suggested_name = f"sm_{asset_id}{extension}" 
+        return suggested_name
+    
+    if file_type == "texture":
+        
+        map_type =detect_texture_map_type(file_name)
+        if map_type==None:
+            return file_name
+        
+        suggested_name = f"t_{asset_id}_{map_type}{extension}"
+        
+        return suggested_name  
+    
+    return file_name
+  
+def detect_destination_conflict(suggested_actions):
+    
+    destination_seen = {}
+    conflicts = []
+    
+    for action in suggested_actions:
+                
+        destination_path = action["to"]
+        
+        if destination_path in destination_seen:
+            conflicts.append({
+                "destination":destination_path,
+                "files":[
+                    destination_seen[destination_path]["file"],
+                    action["file"]
+                ]
+            })
+        else:
+            destination_seen[destination_path]=action
+        
+    return conflicts
+      
 def main():
     
     base_path = os.path.dirname(__file__)
@@ -185,8 +319,8 @@ def main():
     
     files = list_files(input_path)
     classified_files = classify_files(files)
-    
-    
+    assets = group_files_by_asset(classified_files)
+    #print(generate_suggested_actions(assets))
     report = generate_report(classified_files)
     
     save_json(report_path,report)

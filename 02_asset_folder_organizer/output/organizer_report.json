@@ -1,10 +1,12 @@
 {
     "summary": {
-        "total_files": 7,
+        "total_files": 8,
         "total_meshes": 2,
-        "total_textures": 3,
+        "total_textures": 4,
         "total_other": 2,
-        "total_assets": 2
+        "total_assets": 2,
+        "total_suggested_actions": 8,
+        "total_conflicts": 1
     },
     "classified_files": {
         "mesh": [
@@ -14,7 +16,8 @@
         "texture": [
             "chairbasecolor.png",
             "jeepbasecolor.png",
-            "jeeproughness.jpg"
+            "jeeproughness.jpg",
+            "jeep_basecolor.png"
         ],
         "other": [
             "notes.txt",
@@ -36,7 +39,8 @@
             ],
             "textures": [
                 "jeepbasecolor.png",
-                "jeeproughness.jpg"
+                "jeeproughness.jpg",
+                "jeep_basecolor.png"
             ]
         }
     },
@@ -50,6 +54,80 @@
             "asset_folder": "organized_assets/jeep",
             "meshes_folder": "organized_assets/jeep/meshes",
             "textures_folder": "organized_assets/jeep/textures"
+        },
+        "misc": {
+            "misc_folder": "organized_assets/misc"
         }
-    }
+    },
+    "suggested_actions": [
+        {
+            "action": "move",
+            "file": "chair.fbx",
+            "needs_rename": true,
+            "suggested_name": "sm_chair.fbx",
+            "from": "sample_input/chair.fbx",
+            "to": "organized_assets/chair/meshes/sm_chair.fbx"
+        },
+        {
+            "action": "move",
+            "file": "chairbasecolor.png",
+            "needs_rename": true,
+            "suggested_name": "t_chair_basecolor.png",
+            "from": "sample_input/chairbasecolor.png",
+            "to": "organized_assets/chair/textures/t_chair_basecolor.png"
+        },
+        {
+            "action": "move",
+            "file": "sm_jeep.fbx",
+            "needs_rename": false,
+            "suggested_name": "sm_jeep.fbx",
+            "from": "sample_input/sm_jeep.fbx",
+            "to": "organized_assets/jeep/meshes/sm_jeep.fbx"
+        },
+        {
+            "action": "move",
+            "file": "jeepbasecolor.png",
+            "needs_rename": true,
+            "suggested_name": "t_jeep_basecolor.png",
+            "from": "sample_input/jeepbasecolor.png",
+            "to": "organized_assets/jeep/textures/t_jeep_basecolor.png"
+        },
+        {
+            "action": "move",
+            "file": "jeeproughness.jpg",
+            "needs_rename": true,
+            "suggested_name": "t_jeep_roughness.jpg",
+            "from": "sample_input/jeeproughness.jpg",
+            "to": "organized_assets/jeep/textures/t_jeep_roughness.jpg"
+        },
+        {
+            "action": "move",
+            "file": "jeep_basecolor.png",
+            "needs_rename": true,
+            "suggested_name": "t_jeep_basecolor.png",
+            "from": "sample_input/jeep_basecolor.png",
+            "to": "organized_assets/jeep/textures/t_jeep_basecolor.png"
+        },
+        {
+            "action": "move",
+            "file": "notes.txt",
+            "from": "sample_input/notes.txt",
+            "to": "organized_assets/misc/notes.txt"
+        },
+        {
+            "action": "move",
+            "file": "screenshot008.jpg",
+            "from": "sample_input/screenshot008.jpg",
+            "to": "organized_assets/misc/screenshot008.jpg"
+        }
+    ],
+    "conflicts": [
+        {
+            "destination": "organized_assets/jeep/textures/t_jeep_basecolor.png",
+            "files": [
+                "jeepbasecolor.png",
+                "jeep_basecolor.png"
+            ]
+        }
+    ]
 }
