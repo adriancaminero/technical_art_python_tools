@@ -1,5 +1,13 @@
 import os
 import json
+import shutil
+
+def build_real_path(base_path, relative_path):
+    parts = relative_path.split("/")
+    real_path = os.path.join(base_path,*parts)
+    
+    return real_path
+
 
 def list_files(path):
     
@@ -60,6 +68,7 @@ def generate_report(classified_files):
     meshes = classified_files["mesh"]
     textures = classified_files["texture"]
     other = classified_files["other"]
+    base_path = os.path.dirname(__file__)
     
     assets = group_files_by_asset(classified_files)
     
@@ -70,6 +79,8 @@ def generate_report(classified_files):
     conflicts = detect_destination_conflict(actions)
     
     actions = mark_action_status(actions,conflicts)
+    
+    
     
     return{
         "summary":{
@@ -89,7 +100,8 @@ def generate_report(classified_files):
         "assets":assets,
         "suggested_structure":suggestion,
         "suggested_actions":actions,
-        "conflicts":conflicts
+        "conflicts":conflicts,
+        
     }
     
 def extract_asset_id(file_name,file_type):
@@ -334,9 +346,66 @@ def mark_action_status(suggested_action,conflicts):
         
         updated_actions.append(action)
         
-    return updated_actions
+    return updated_actions 
         
+def apply_actions(suggested_actions,base_path):
+    
+    applied_actions = []
+    skipped_actions = []
+    
+    for action in suggested_actions:
+        
+        source_relative_path = action["from"]
+        destination_relative_path = action["apply_to"]
+        
+        source_path = build_real_path(base_path,source_relative_path)
+        destination_path = build_real_path(base_path,destination_relative_path)
+        
+        if not os.path.exists(source_path):
+            skipped_actions.append({
+                    "file": action["file"],
+                    "reason": "source file does not exist",
+                    "from": source_relative_path,
+                    "to": destination_relative_path
+                })  
+            continue
+            
+        if os.path.exists(destination_path):
+            skipped_actions.append({
+                    "file": action["file"],
+                    "reason": "destination already exists",
+                    "from": source_relative_path,
+                    "to": destination_relative_path
+                })
+            continue
+    
+        destination_folder = os.path.dirname(destination_path)
+        os.makedirs(destination_folder,exist_ok=True)
+        
+        shutil.move(source_path,destination_path)
+    
+        applied_actions.append({
+                "file": action["file"],
+                "status": action["status"],
+                "from": source_relative_path,
+                "to": destination_relative_path
+            })
+    
+    return {
+        "applied_actions": applied_actions,
+        "skipped_actions": skipped_actions,
+        "total_applied": len(applied_actions),
+        "total_skipped": len(skipped_actions)
+    }
 
+    
+        
+          
+        
+        
+            
+    
+    
 
       
 def main():
@@ -346,25 +415,31 @@ def main():
     input_path = os.path.join(base_path,"sample_input")
     output_path = os.path.join(base_path,"output")
     report_path = os.path.join(output_path,"organizer_report.json")
+    apply_report_path = os.path.join(output_path,"apply_report.json")
     
     os.makedirs(output_path,exist_ok=True)
     
     files = list_files(input_path)
     classified_files = classify_files(files)
-    assets = group_files_by_asset(classified_files)
-    other = classified_files["other"]
-    suggested = generate_suggested_actions(assets,other)
-    conflicts = detect_destination_conflict(suggested)
-    report = generate_report(classified_files)
     
+    report = generate_report(classified_files)    
     
-    #print(mark_action_status(suggested,conflicts))
     save_json(report_path,report)
     print("Organizer report generated successfully")
     print(f"Report saved in: {report_path}")
-        
     
-    #print(files)
+    APPLY_CHANGES = True    
+    
+    if APPLY_CHANGES:
+        apply_result = apply_actions(report["suggested_actions"], base_path)
+        save_json(apply_report_path, apply_result)
+
+        print("Apply completed")
+        print(f"Apply report saved in: {apply_report_path}")
+    else:
+        print("Dry-run only. No files were moved.")
+    
+    
 
  
     

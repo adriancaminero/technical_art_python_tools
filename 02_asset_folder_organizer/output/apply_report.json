@@ -1,0 +1,55 @@
+{
+    "applied_actions": [
+        {
+            "file": "chair.fbx",
+            "status": "safe",
+            "from": "sample_input/chair.fbx",
+            "to": "organized_assets/chair/meshes/sm_chair.fbx"
+        },
+        {
+            "file": "chairbasecolor.png",
+            "status": "safe",
+            "from": "sample_input/chairbasecolor.png",
+            "to": "organized_assets/chair/textures/t_chair_basecolor.png"
+        },
+        {
+            "file": "sm_jeep.fbx",
+            "status": "safe",
+            "from": "sample_input/sm_jeep.fbx",
+            "to": "organized_assets/jeep/meshes/sm_jeep.fbx"
+        },
+        {
+            "file": "jeepbasecolor.png",
+            "status": "blocked_conflict",
+            "from": "sample_input/jeepbasecolor.png",
+            "to": "organized_assets/_needs_review/conflicts/jeepbasecolor.png"
+        },
+        {
+            "file": "jeeproughness.jpg",
+            "status": "safe",
+            "from": "sample_input/jeeproughness.jpg",
+            "to": "organized_assets/jeep/textures/t_jeep_roughness.jpg"
+        },
+        {
+            "file": "jeep_basecolor.png",
+            "status": "blocked_conflict",
+            "from": "sample_input/jeep_basecolor.png",
+            "to": "organized_assets/_needs_review/conflicts/jeep_basecolor.png"
+        },
+        {
+            "file": "notes.txt",
+            "status": "safe",
+            "from": "sample_input/notes.txt",
+            "to": "organized_assets/misc/notes.txt"
+        },
+        {
+            "file": "screenshot008.jpg",
+            "status": "safe",
+            "from": "sample_input/screenshot008.jpg",
+            "to": "organized_assets/misc/screenshot008.jpg"
+        }
+    ],
+    "skipped_actions": [],
+    "total_applied": 8,
+    "total_skipped": 0
+}
