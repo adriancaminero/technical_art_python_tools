@@ -68,7 +68,8 @@ def generate_report(classified_files):
     actions = generate_suggested_actions(assets,other)
     
     conflicts = detect_destination_conflict(actions)
-   
+    
+    actions = mark_action_status(actions,conflicts)
     
     return{
         "summary":{
@@ -238,7 +239,7 @@ def generate_suggested_actions(assets,other_files):
             suggested_actions.append({
                 "action": "move",
                 "file": other_file,
-                "needs_rename":needs_rename
+                "needs_rename":needs_rename,
                 "from": source_path,
                 "to": destination_path
                 })
@@ -306,6 +307,37 @@ def detect_destination_conflict(suggested_actions):
             destination_seen[destination_path]=action
         
     return conflicts
+  
+def mark_action_status(suggested_action,conflicts):
+    
+    conflict_destination = []
+    
+    for conflict in conflicts:
+        conflict_destination.append(conflict["destination"])
+        
+    updated_actions = []
+    
+    for action in suggested_action:
+        
+        path = action["to"]
+        
+        if path in conflict_destination:
+            action["status"]="blocked_conflict"
+            
+            review_path = f"organized_assets/_needs_review/conflicts/{action['file']}"
+            action["review_to"] = review_path
+            action["apply_to"] = review_path
+        
+        else:
+            action["status"]="safe"
+            action["apply_to"]=path
+        
+        updated_actions.append(action)
+        
+    return updated_actions
+        
+
+
       
 def main():
     
@@ -320,9 +352,13 @@ def main():
     files = list_files(input_path)
     classified_files = classify_files(files)
     assets = group_files_by_asset(classified_files)
-    #print(generate_suggested_actions(assets))
+    other = classified_files["other"]
+    suggested = generate_suggested_actions(assets,other)
+    conflicts = detect_destination_conflict(suggested)
     report = generate_report(classified_files)
     
+    
+    #print(mark_action_status(suggested,conflicts))
     save_json(report_path,report)
     print("Organizer report generated successfully")
     print(f"Report saved in: {report_path}")
