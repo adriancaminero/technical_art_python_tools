@@ -2,12 +2,45 @@ import os
 import json
 import shutil
 
+INPUT_FOLDER = "sample_input"
+ORGANIZED_FOLDER = "organized_assets"
+REPORT_FOLDER = "output"
+
+ORGANIZER_REPORT_NAME = "organizer_report.json"
+APPLY_REPORT_NAME = "apply_report.json"
+
+REVIEW_CONFLICTS_FOLDER = "_needs_review/conflicts"
+
+MESH_EXTENSIONS = (
+    ".fbx",
+    ".obj",
+    ".blend",
+    ".max",
+    ".ma",
+    ".mb",
+    ".ztl",
+    ".zpr"
+)
+RENAMEABLE_MESH_EXTENSIONS = (".fbx",".obj")
+TEXTURE_EXTENSIONS = (
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".tga",
+    ".exr",
+    ".tif",
+    ".tiff",
+    ".psd",
+    ".spp"
+)
+
+APPLY_CHANGES = True
+
 def build_real_path(base_path, relative_path):
     parts = relative_path.split("/")
     real_path = os.path.join(base_path,*parts)
     
     return real_path
-
 
 def list_files(path):
     
@@ -35,10 +68,10 @@ def detect_file_type(file_name):
     extension = extension.lower()
     name = name.lower()
     
-    if extension==".fbx":
+    if extension in MESH_EXTENSIONS:
         return "mesh"
     
-    if extension in (".png", ".jpg", ".jpeg", ".tga"):
+    if extension in TEXTURE_EXTENSIONS:
         for keyword in ignored_image_keywords:
             if keyword in name:
                 return "other"
@@ -63,7 +96,7 @@ def classify_files(files):
                     
     return classified_files
             
-def generate_report(classified_files):
+def generate_report(classified_files,input_folder,organized_folder,review_conflicts_folder):
     
     meshes = classified_files["mesh"]
     textures = classified_files["texture"]
@@ -72,13 +105,13 @@ def generate_report(classified_files):
     
     assets = group_files_by_asset(classified_files)
     
-    suggestion = generate_suggested_structure(assets,other)
+    suggestion = generate_suggested_structure(assets,other,organized_folder)
     
-    actions = generate_suggested_actions(assets,other)
+    actions = generate_suggested_actions(assets,other,input_folder,organized_folder)
     
     conflicts = detect_destination_conflict(actions)
     
-    actions = mark_action_status(actions,conflicts)
+    actions = mark_action_status(actions,conflicts,organized_folder,review_conflicts_folder)
     
     
     
@@ -177,13 +210,13 @@ def group_files_by_asset(classified_files):
         
     return assets    
         
-def generate_suggested_structure(assets,other_files):
+def generate_suggested_structure(assets,other_files,organized_folder):
     
     suggested_structure = {}
     
     for asset in assets:
         
-        asset_folder = f"organized_assets/{asset}"
+        asset_folder = f"{organized_folder}/{asset}"
         mesh_folder = asset_folder+"/meshes"
         texture_folder = asset_folder+"/textures"
         
@@ -195,14 +228,14 @@ def generate_suggested_structure(assets,other_files):
     
     if len(other_files)>0:
         suggested_structure["misc"]={
-            "misc_folder":"organized_assets/misc"
+            "misc_folder":f"{organized_folder}/misc"
         }
         
         
      
     return suggested_structure
   
-def generate_suggested_actions(assets,other_files):
+def generate_suggested_actions(assets,other_files,input_folder,organized_folder):
     
     suggested_actions = []
     
@@ -214,9 +247,9 @@ def generate_suggested_actions(assets,other_files):
         textures = asset_data["textures"]    
         
         for mesh in meshes:
-            source_path = "sample_input/"+mesh     
+            source_path = f"{input_folder}/"+mesh     
             suggested_name = suggest_file_name(mesh,"mesh",asset)       
-            destination_path = f"organized_assets/{asset}/meshes/{suggested_name}"
+            destination_path = f"{organized_folder}/{asset}/meshes/{suggested_name}"
             needs_rename = suggested_name!=mesh
             
             
@@ -230,9 +263,9 @@ def generate_suggested_actions(assets,other_files):
             })
             
         for texture in textures:
-            source_path = "sample_input/"+texture   
+            source_path = f"{input_folder}/"+texture   
             suggested_name = suggest_file_name(texture,"texture",asset)         
-            destination_path = f"organized_assets/{asset}/textures/{suggested_name}"
+            destination_path = f"{organized_folder}/{asset}/textures/{suggested_name}"
             needs_rename = suggested_name!=texture
             
             suggested_actions.append({
@@ -244,10 +277,10 @@ def generate_suggested_actions(assets,other_files):
                 "to":destination_path
                 })
     for other_file in other_files:
-            source_path = "sample_input/"+other_file   
+            source_path = f"{input_folder}/"+other_file   
             needs_rename = False
               
-            destination_path = f"organized_assets/misc/{other_file}"
+            destination_path = f"{organized_folder}/misc/{other_file}"
             suggested_actions.append({
                 "action": "move",
                 "file": other_file,
@@ -265,7 +298,8 @@ def detect_texture_map_type(file_name):
                 "metallic",
                 "ao",
                 "opacity",
-                "emissive"
+                "emissive",
+                "height"
                 ]
     
     name, extension = os.path.splitext(file_name)
@@ -279,12 +313,14 @@ def detect_texture_map_type(file_name):
     return None
            
 def suggest_file_name(file_name,file_type,asset_id):
+    
+    
     name , extension = os.path.splitext(file_name)
     extension = extension.lower()
     if file_type ==  "mesh":
-                
-        suggested_name = f"sm_{asset_id}{extension}" 
-        return suggested_name
+        if extension in RENAMEABLE_MESH_EXTENSIONS:       
+            suggested_name = f"sm_{asset_id}{extension}" 
+            return suggested_name
     
     if file_type == "texture":
         
@@ -320,7 +356,7 @@ def detect_destination_conflict(suggested_actions):
         
     return conflicts
   
-def mark_action_status(suggested_action,conflicts):
+def mark_action_status(suggested_action,conflicts,organized_folder,review_conflicts_folder):
     
     conflict_destination = []
     
@@ -336,7 +372,7 @@ def mark_action_status(suggested_action,conflicts):
         if path in conflict_destination:
             action["status"]="blocked_conflict"
             
-            review_path = f"organized_assets/_needs_review/conflicts/{action['file']}"
+            review_path = f"{organized_folder}/{review_conflicts_folder}/{action['file']}"
             action["review_to"] = review_path
             action["apply_to"] = review_path
         
@@ -412,23 +448,23 @@ def main():
     
     base_path = os.path.dirname(__file__)
 
-    input_path = os.path.join(base_path,"sample_input")
-    output_path = os.path.join(base_path,"output")
-    report_path = os.path.join(output_path,"organizer_report.json")
-    apply_report_path = os.path.join(output_path,"apply_report.json")
+    input_path = os.path.join(base_path,INPUT_FOLDER)
+    output_path = os.path.join(base_path,REPORT_FOLDER)
+    report_path = os.path.join(output_path,ORGANIZER_REPORT_NAME)
+    apply_report_path = os.path.join(output_path,APPLY_REPORT_NAME)
     
     os.makedirs(output_path,exist_ok=True)
     
     files = list_files(input_path)
     classified_files = classify_files(files)
     
-    report = generate_report(classified_files)    
+    report = generate_report(classified_files,INPUT_FOLDER,ORGANIZED_FOLDER,REVIEW_CONFLICTS_FOLDER)    
     
     save_json(report_path,report)
     print("Organizer report generated successfully")
     print(f"Report saved in: {report_path}")
     
-    APPLY_CHANGES = True    
+       
     
     if APPLY_CHANGES:
         apply_result = apply_actions(report["suggested_actions"], base_path)
