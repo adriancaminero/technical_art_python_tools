@@ -34,7 +34,19 @@ TEXTURE_EXTENSIONS = (
     ".spp"
 )
 
-APPLY_CHANGES = True
+APPLY_CHANGES = False
+
+def ask_user_settings():
+    input_folder = input("Input folder [sample_input]: ").strip()
+    
+    if input_folder=="":
+        input_folder=INPUT_FOLDER
+        
+    apply_answer = input("Apply changes? y/N : ").strip().lower()
+    
+    apply_changes = apply_answer=="y"
+    
+    return input_folder,apply_changes
 
 def build_real_path(base_path, relative_path):
     parts = relative_path.split("/")
@@ -434,31 +446,27 @@ def apply_actions(suggested_actions,base_path):
         "total_skipped": len(skipped_actions)
     }
 
-    
-        
-          
-        
-        
-            
-    
-    
-
-      
+   
 def main():
     
     base_path = os.path.dirname(__file__)
-
-    input_path = os.path.join(base_path,INPUT_FOLDER)
+    input_folder, apply_changes = ask_user_settings()
+    
+    input_path = os.path.join(base_path,input_folder)
     output_path = os.path.join(base_path,REPORT_FOLDER)
     report_path = os.path.join(output_path,ORGANIZER_REPORT_NAME)
     apply_report_path = os.path.join(output_path,APPLY_REPORT_NAME)
+    
+    if not os.path.isdir(input_path):
+        print(f"Input folder not found: {input_path}")
+        return
     
     os.makedirs(output_path,exist_ok=True)
     
     files = list_files(input_path)
     classified_files = classify_files(files)
     
-    report = generate_report(classified_files,INPUT_FOLDER,ORGANIZED_FOLDER,REVIEW_CONFLICTS_FOLDER)    
+    report = generate_report(classified_files,input_folder,ORGANIZED_FOLDER,REVIEW_CONFLICTS_FOLDER)    
     
     save_json(report_path,report)
     print("Organizer report generated successfully")
@@ -466,7 +474,7 @@ def main():
     
        
     
-    if APPLY_CHANGES:
+    if apply_changes:
         apply_result = apply_actions(report["suggested_actions"], base_path)
         save_json(apply_report_path, apply_result)
 
