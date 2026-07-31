@@ -1,6 +1,8 @@
 import os
 import json
 import shutil
+import argparse
+import sys
 
 INPUT_FOLDER = "sample_input"
 ORGANIZED_FOLDER = "organized_assets"
@@ -47,6 +49,15 @@ def ask_user_settings():
     apply_changes = apply_answer=="y"
     
     return input_folder,apply_changes
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Organize chaotic asset folders into a clean structure.")
+
+    parser.add_argument("--input",default=INPUT_FOLDER,help="Input folder to organize. Default: sample_input")
+     
+    parser.add_argument("--apply",action="store_true",help="Apply changes. If not used, the tool runs in dry-run mode.")
+
+    return parser.parse_args()
 
 def build_real_path(base_path, relative_path):
     parts = relative_path.split("/")
@@ -450,7 +461,14 @@ def apply_actions(suggested_actions,base_path):
 def main():
     
     base_path = os.path.dirname(__file__)
-    input_folder, apply_changes = ask_user_settings()
+    
+    if len(sys.argv)>1:
+        args = parse_arguments()
+        input_folder = args.input
+        apply_changes = args.apply
+    
+    else:
+        input_folder, apply_changes = ask_user_settings()
     
     input_path = os.path.join(base_path,input_folder)
     output_path = os.path.join(base_path,REPORT_FOLDER)
