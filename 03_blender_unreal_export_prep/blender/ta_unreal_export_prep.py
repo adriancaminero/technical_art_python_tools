@@ -1,8 +1,11 @@
 import bpy
 import os
 import json
+from datetime import datetime
 from mathutils import Vector
 
+
+PENDING_IMPORTS_FILE_NAME = "_pending_imports.json"
 
 EXPORT_ROOT_FOLDER = r"C:\Users\adric\OneDrive\Escritorio\Python\blender_ta_tools\Test_export"
 
@@ -323,6 +326,52 @@ def save_validation_report(objects, export_folder, file_name):
 
     return report_path
 
+def load_pending_imports(queue_path):
+    if not os.path.exists(queue_path):
+        return {
+            "pending_manifests": []
+        }
+
+    with open(queue_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    if "pending_manifests" not in data:
+        data["pending_manifests"] = []
+
+    return data
+
+
+def save_pending_imports(queue_path, data):
+    os.makedirs(os.path.dirname(queue_path), exist_ok=True)
+
+    with open(queue_path, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+
+    print("Pending imports queue saved:")
+    print(queue_path)
+
+
+def add_manifest_to_pending_queue(manifest_path, export_root_folder):
+    queue_path = os.path.join(export_root_folder, PENDING_IMPORTS_FILE_NAME)
+
+    manifest_path = os.path.abspath(manifest_path)
+
+    data = load_pending_imports(queue_path)
+
+    pending_manifests = data["pending_manifests"]
+
+
+    if manifest_path in pending_manifests:
+        pending_manifests.remove(manifest_path)
+
+    pending_manifests.append(manifest_path)
+
+    data["last_updated"] = datetime.now().isoformat(timespec="seconds")
+
+    save_pending_imports(queue_path, data)
+
+    print("Added manifest to pending queue:")
+    print(manifest_path)
 
 def save_unreal_manifest(
     asset_name,
@@ -535,7 +584,7 @@ def run_export_package():
         if export_success:
             print("---- SAVE UNREAL MANIFEST ----")
 
-            save_unreal_manifest(
+            manifest_path = save_unreal_manifest(
                 asset_name,
                 selected_objects,
                 asset_export_folder,
@@ -543,6 +592,8 @@ def run_export_package():
                 report_file_name,
                 unreal_destination_root
             )
+            
+            add_manifest_to_pending_queue(manifest_path,export_root_folder)
         else:
             print("Manifest skipped because FBX export did not run successfully.")
 
@@ -575,11 +626,10 @@ class TA_PT_unreal_export_prep_panel(bpy.types.Panel):
         layout.label(text="Options")
         layout.prop(scene,"ta_auto_fix_name")
         layout.prop(scene, "ta_auto_fix_transforms")
-        layout.prop(scene, "ta_auto_fix_name")
-        layout.prop(scene, "ta_auto_fix_transforms")
+
         layout.prop(scene, "ta_normal_mode")
         layout.prop(scene, "ta_set_pivot_bottom_center")
-        layout.prop(scene, "ta_set_pivot_bottom_center")
+
         layout.prop(scene, "ta_export_from_world_origin")
         layout.prop(scene, "ta_validate_pivot_bottom_center")
         layout.prop(scene, "ta_export_fbx")

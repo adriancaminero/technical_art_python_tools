@@ -1,0 +1,14 @@
+{
+    "asset_name": "SM_Cube",
+    "source_software": "Blender",
+    "target_software": "Unreal Engine",
+    "export_type": "FBX",
+    "fbx_file": "SM_Cube.fbx",
+    "fbx_path": "C:\\Users\\adric\\OneDrive\\Escritorio\\Python\\Github\\technical_art_python_tools\\03_blender_unreal_export_prep\\Test_export\\SM_Cube\\SM_Cube.fbx",
+    "validation_report": "SM_Cube_validation_report.json",
+    "validation_report_path": "C:\\Users\\adric\\OneDrive\\Escritorio\\Python\\Github\\technical_art_python_tools\\03_blender_unreal_export_prep\\Test_export\\SM_Cube\\SM_Cube_validation_report.json",
+    "unreal_destination_path": "/Game/PutoExports/SM_Cube",
+    "objects": [
+        "SM_Cube"
+    ]
+}
