@@ -373,14 +373,7 @@ def add_manifest_to_pending_queue(manifest_path, export_root_folder):
     print("Added manifest to pending queue:")
     print(manifest_path)
 
-def save_unreal_manifest(
-    asset_name,
-    objects,
-    export_folder,
-    fbx_file_name,
-    validation_report_name,
-    unreal_destination_root
-):
+def save_unreal_manifest(asset_name,objects,export_folder,fbx_file_name,validation_report_name,unreal_destination_root):
     mesh_objects = []
 
     for obj in objects:

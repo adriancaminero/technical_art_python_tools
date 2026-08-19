@@ -3,7 +3,7 @@ import json
 import os
 
 
-SETTINGS_FILE_NAME = "bridge_settings.json"
+SETTINGS_FILE_NAME = "where_blender_exports_are.json"
 PENDING_IMPORTS_FILE_NAME = "_pending_imports.json"
 
 
